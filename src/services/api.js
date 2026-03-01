@@ -33,7 +33,7 @@ export async function uploadFileToSupabase(file) {
  * @param {string} fileName 
  */
 export async function triggerWorkflow(fileUrl, fileName) {
-    const webhookUrl = 'https://api-officeless-dev.mekari.com/28086/send_picture_to_aws';
+    const officelessUrl = 'https://api-officeless-dev.mekari.com/28086/send_picture_to_aws';
 
     const payload = {
         file_url: fileUrl,
@@ -41,7 +41,7 @@ export async function triggerWorkflow(fileUrl, fileName) {
         created_date: new Date().toISOString()
     };
 
-    const response = await fetch(webhookUrl, {
+    const response = await fetch(officelessUrl, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',

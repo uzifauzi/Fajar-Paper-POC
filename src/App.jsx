@@ -2,19 +2,23 @@ import { useState } from 'react';
 import Navbar from './components/Navbar';
 import { FileUploader } from './components/FileUploader';
 import { FileCard } from './components/FileCard';
-import { FileDown, X } from 'lucide-react';
+import { CheckCircle2, AlertCircle } from 'lucide-react';
 import { uploadFileToSupabase, triggerWorkflow } from './services/api';
+import { Alert, AlertTitle, AlertDescription } from './components/ui/alert';
+
 
 function App() {
   const [file, setFile] = useState(null);
   const [isUploading, setIsUploading] = useState(false);
   const [progress, setProgress] = useState(0);
+  const [alertInfo, setAlertInfo] = useState({ show: false, type: 'default', message: '' });
 
   const handleUpload = (acceptedFiles) => {
     if (acceptedFiles.length > 0) {
       setFile(acceptedFiles[0]);
       setIsUploading(false);
       setProgress(0);
+      setAlertInfo({ show: false, type: 'default', message: '' });
     }
   };
 
@@ -22,12 +26,14 @@ function App() {
     setFile(null);
     setIsUploading(false);
     setProgress(0);
+    setAlertInfo({ show: false, type: 'default', message: '' });
   };
 
   const handleUploadSubmit = async () => {
     if (!file) return;
     setIsUploading(true);
     setProgress(0);
+    setAlertInfo({ show: false, type: 'default', message: '' });
 
     // Simulate upload progress
     const interval = setInterval(() => {
@@ -48,7 +54,7 @@ function App() {
 
       setTimeout(() => {
         setIsUploading(false);
-        alert('File uploaded successfully!');
+        setAlertInfo({ show: true, type: 'default', message: 'File uploaded successfully!' });
         setFile(null);
         setProgress(0);
       }, 500);
@@ -56,7 +62,7 @@ function App() {
       clearInterval(interval);
       setIsUploading(false);
       setProgress(0);
-      alert(`Upload failed: ${error.message}`);
+      setAlertInfo({ show: true, type: 'destructive', message: `Upload failed: ${error.message}` });
     }
   };
 
@@ -77,6 +83,22 @@ function App() {
               Upload your file
             </p>
           </div>
+
+          {/* Alert Section */}
+          {alertInfo.show && (
+            <Alert
+              variant={alertInfo.type}
+              className={`mb-6 ${alertInfo.type === 'default' ? 'border-green-500/50 text-green-700 bg-green-50 [&>svg]:text-green-600' : ''}`}
+            >
+              {alertInfo.type === 'default' ? (
+                <CheckCircle2 className="h-4 w-4" />
+              ) : (
+                <AlertCircle className="h-4 w-4" />
+              )}
+              <AlertTitle>{alertInfo.type === 'default' ? 'success' : 'failure'}</AlertTitle>
+              <AlertDescription>{alertInfo.message}</AlertDescription>
+            </Alert>
+          )}
 
           {/* Upload Area */}
           <div className="space-y-6 bg-white p-8 rounded-2xl border border-gray-200 shadow-sm">
@@ -103,30 +125,6 @@ function App() {
               </div>
             )}
           </div>
-
-          {/* Example Template Section based on the image */}
-          {/* <div className="pt-8">
-            <h3 className="text-sm font-medium text-gray-700 mb-4">
-              Template file to download
-            </h3>
-
-            <div className="bg-white rounded-xl border border-gray-200 p-4 flex items-center justify-between shadow-sm">
-              <div className="flex items-center gap-4">
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-green-50 text-green-600">
-                  <FileDown className="h-5 w-5" />
-                </div>
-                <div className="flex flex-col">
-                  <span className="text-sm font-medium text-gray-900">Template Classification.xlsx</span>
-                  <span className="text-xs text-gray-500">4.49 KB</span>
-                </div>
-              </div>
-
-              <button className="flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition shadow-sm">
-                <FileDown className="w-4 h-4" />
-                Download
-              </button>
-            </div>
-          </div> */}
 
         </div>
       </main>
